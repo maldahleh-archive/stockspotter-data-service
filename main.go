@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/maldahleh/stockspotter-data-service/handlers"
 	"log"
 	"net/http"
 
@@ -15,9 +16,8 @@ func handleRequest(rw http.ResponseWriter, req *http.Request) {
 		request = models.DefaultRequest
 	}
 
-	resp, err := json.Marshal("{}")
-	if err != nil {
-		log.Println("Failed to marshal JSON", err)
+	resp := handlers.FetchStocks(request.Version)
+	if resp == nil {
 		http.Error(rw, "request failed, try again later", http.StatusInternalServerError)
 		return
 	}
