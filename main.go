@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/maldahleh/stockspotter-data-service/handlers"
 	"log"
 	"net/http"
 
+	"github.com/joho/godotenv"
+	"github.com/maldahleh/stockspotter-data-service/handlers"
 	"github.com/maldahleh/stockspotter-data-service/models"
 )
 
@@ -25,6 +26,12 @@ func handleRequest(rw http.ResponseWriter, req *http.Request) {
 	_, err = rw.Write(resp)
 	if err != nil {
 		log.Println("HTTP write failure", err)
+	}
+}
+
+func init() {
+	if err := godotenv.Load("properties.env"); err != nil {
+		log.Println("No .env file found")
 	}
 }
 
