@@ -8,16 +8,17 @@ import (
 	"github.com/maldahleh/stockspotter-data-service/downloader/models"
 )
 
-const root = "https://cloud.iexapis.com/v1/stock/"
+const root = "https://cloud.iexapis.com/v1/stock/market/batch?types=quote&displayPercent=true" +
+	"&token=&symbols="
 
-func GetStockData(symbol string) *models.StockData {
-	var iexData models.IexData
-	err := getJSON(createUrl(symbol), &iexData)
+func GetStockData(symbols string) models.IexBatchResponse {
+	var iexData models.IexBatchResponse
+	err := getJSON(root + symbols, &iexData)
 	if err != nil {
 		return nil
 	}
 
-	return iexData.AsStockData()
+	return iexData
 }
 
 func getJSON(url string, result interface{}) error {
@@ -38,8 +39,4 @@ func getJSON(url string, result interface{}) error {
 	}
 
 	return nil
-}
-
-func createUrl(symbol string) string {
-	return root + symbol + "/quote?displayPercent=true&token=sk_cf7d9c2fdd9447fc8204eec400bd5b9b"
 }

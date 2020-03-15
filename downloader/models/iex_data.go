@@ -1,5 +1,11 @@
 package models
 
+type IexBatchResponse map[string]IexOuterStruct
+
+type IexOuterStruct struct {
+	Quote IexData `json:"quote"`
+}
+
 type IexData struct {
 	Price                 float64 `json:"latestPrice"`
 	Change                float64 `json:"change"`
@@ -12,16 +18,24 @@ type IexData struct {
 	MarketOpen            bool    `json:"isUSMarketOpen"`
 }
 
-func (data IexData) AsStockData() *StockData {
+func (data IexOuterStruct) AsStockData() *StockData {
+	if data.Quote.MarketOpen || data.Quote.ExtendedChange == 0 {
+		return &StockData{
+			Price:                 data.Quote.Price,
+			Change:                data.Quote.Change,
+			ChangePercent:         data.Quote.ChangePercent,
+			Volume:                data.Quote.Volume,
+			MarketCap:             data.Quote.MarketCap,
+		}
+	}
+
+
+
 	return &StockData{
-		Price:                 data.Price,
-		Change:                data.Change,
-		ChangePercent:         data.ChangePercent,
-		ExtendedPrice:         data.ExtendedPrice,
-		ExtendedChange:        data.ExtendedChange,
-		ExtendedChangePercent: data.ExtendedChangePercent,
-		Volume:                data.Volume,
-		MarketCap:             data.MarketCap,
-		MarketOpen:            data.MarketOpen,
+		Price:                 data.Quote.ExtendedPrice,
+		Change:                data.Quote.ExtendedChange,
+		ChangePercent:         data.Quote.ExtendedChangePercent,
+		Volume:                data.Quote.Volume,
+		MarketCap:             data.Quote.MarketCap,
 	}
 }

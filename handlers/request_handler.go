@@ -14,14 +14,8 @@ type stockInputFileStructure map[string][]string
 type data map[string]industryData
 type industryData map[string]*models.StockData
 
-type industryDataChannel struct {
-	industry string
-	data     industryData
-}
-
-type stockDataChannel struct {
-	symbol string
-	data   *models.StockData
+type dataChannel struct {
+	data models.IexBatchResponse
 }
 
 func FetchStocks(version string) []byte {
@@ -38,22 +32,48 @@ func FetchStocks(version string) []byte {
 		return nil
 	}
 
-	fetchedData := make(data)
-	channel := make(chan industryDataChannel)
+	channel := make(chan dataChannel)
+	stockToIndustryMap := make(map[string]string)
+	stockSeparatedList := ""
 
-	channelCalls := 0
+	currentBatch := 0
+	batchCalls := 0
 	for industry, symbols := range inputData {
-		channelCalls++
-		go fetchIndustryData(industry, symbols, channel)
+		for index, symbol := range symbols {
+			stockToIndustryMap[symbol] = industry
+			stockSeparatedList += symbol + ","
+			currentBatch++
+
+			if currentBatch == 99 || index == len(symbols) - 1 {
+				currentBatch = 0
+				batchCalls++
+
+				stockSeparatedList = stockSeparatedList[:len(stockSeparatedList) - 1]
+				go fetchSet(stockSeparatedList, channel)
+
+				stockSeparatedList = ""
+			}
+		}
 	}
 
-	for i := 0; i < channelCalls; i++ {
+	fetchedData := make(data)
+	for i := 0; i < batchCalls; i++ {
 		channelData := <-channel
 		if channelData.data == nil {
 			continue
 		}
 
-		fetchedData[channelData.industry] = channelData.data
+		for symbol, iexResponse := range channelData.data {
+			industry := stockToIndustryMap[symbol]
+
+			industryDataForStock := fetchedData[industry]
+			if industryDataForStock == nil {
+				industryDataForStock = make(industryData)
+			}
+
+			industryDataForStock[symbol] = iexResponse.AsStockData()
+			fetchedData[industry] = industryDataForStock
+		}
 	}
 
 	body, err := json.Marshal(fetchedData)
@@ -64,36 +84,7 @@ func FetchStocks(version string) []byte {
 	return body
 }
 
-func fetchIndustryData(industry string, symbols []string, industryChannel chan industryDataChannel) {
-	data := make(industryData)
-	channel := make(chan stockDataChannel)
-
-	channelCalls := 0
-	for _, symbol := range symbols {
-		channelCalls++
-		go fetchStock(symbol, channel)
-	}
-
-	for i := 0; i < channelCalls; i++ {
-		channelData := <-channel
-		if channelData.data == nil {
-			continue
-		}
-
-		data[channelData.symbol] = channelData.data
-	}
-
-	industryChannel <- industryDataChannel{
-		industry: industry,
-		data:     data,
-	}
-}
-
-func fetchStock(symbol string, channel chan stockDataChannel) {
-	data := downloader.GetStockData(symbol)
-
-	channel <- stockDataChannel{
-		symbol: symbol,
-		data:   data,
-	}
+func fetchSet(symbols string, channel chan dataChannel) {
+	data := downloader.GetStockData(symbols)
+	channel <- dataChannel{data:data}
 }
