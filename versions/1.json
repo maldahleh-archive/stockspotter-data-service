@@ -67,5 +67,55 @@
     "ACB",
     "AGRO",
     "APHA"
+  ],
+  "airFreight": [
+    "UPS",
+    "FDX",
+    "ZTO",
+    "EXPD",
+    "CHRW",
+    "FWRD",
+    "HUBG",
+    "BEST",
+    "CYRX",
+    "AAWW",
+    "RRTS"
+  ],
+  "altPower": [
+    "BIP",
+    "TERP",
+    "ORA",
+    "NEP",
+    "PEGI",
+    "AY",
+    "AZRE",
+    "JHB",
+    "ELLO",
+    "SKYS"
+  ],
+  "airlines": [
+    "DAL",
+    "CEA",
+    "LUV",
+    "ZNH",
+    "RYAAY",
+    "UAL",
+    "AAL",
+    "ALK",
+    "JBLU",
+    "LTM",
+    "CPA",
+    "ALGT",
+    "AZUL",
+    "SKYW",
+    "SAVE",
+    "ATSG"
+  ],
+  "aluminum": [
+    "ARNC",
+    "AA",
+    "KALU",
+    "ACH",
+    "CENX"
   ]
 }
