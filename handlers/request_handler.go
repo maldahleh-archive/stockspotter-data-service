@@ -12,7 +12,7 @@ import (
 type stockInputFileStructure map[string][]string
 
 type data map[string]industryData
-type industryData map[string]*models.StockData
+type industryData []*models.StockData
 
 type dataChannel struct {
 	data models.IexBatchResponse
@@ -68,10 +68,10 @@ func FetchStocks(version string) []byte {
 
 			industryDataForStock := fetchedData[industry]
 			if industryDataForStock == nil {
-				industryDataForStock = make(industryData)
+				industryDataForStock = make(industryData, 5)
 			}
 
-			industryDataForStock[symbol] = iexResponse.AsStockData()
+			industryDataForStock = append(industryDataForStock, iexResponse.AsStockData())
 			fetchedData[industry] = industryDataForStock
 		}
 	}

@@ -7,6 +7,7 @@ type IexOuterStruct struct {
 }
 
 type IexData struct {
+	Symbol                string  `json:"symbol"`
 	Price                 float64 `json:"latestPrice"`
 	Change                float64 `json:"change"`
 	ChangePercent         float64 `json:"changePercent"`
@@ -21,21 +22,21 @@ type IexData struct {
 func (data IexOuterStruct) AsStockData() *StockData {
 	if data.Quote.MarketOpen || data.Quote.ExtendedChange == 0 {
 		return &StockData{
-			Price:                 data.Quote.Price,
-			Change:                data.Quote.Change,
-			ChangePercent:         data.Quote.ChangePercent,
-			Volume:                data.Quote.Volume,
-			MarketCap:             data.Quote.MarketCap,
+			Symbol:        data.Quote.Symbol,
+			Price:         data.Quote.Price,
+			Change:        data.Quote.Change,
+			ChangePercent: data.Quote.ChangePercent,
+			Volume:        data.Quote.Volume,
+			MarketCap:     data.Quote.MarketCap,
 		}
 	}
 
-
-
 	return &StockData{
-		Price:                 data.Quote.ExtendedPrice,
-		Change:                data.Quote.ExtendedChange,
-		ChangePercent:         data.Quote.ExtendedChangePercent,
-		Volume:                data.Quote.Volume,
-		MarketCap:             data.Quote.MarketCap,
+		Symbol:        data.Quote.Symbol,
+		Price:         data.Quote.ExtendedPrice,
+		Change:        data.Quote.ExtendedChange,
+		ChangePercent: data.Quote.ExtendedChangePercent,
+		Volume:        data.Quote.Volume,
+		MarketCap:     data.Quote.MarketCap,
 	}
 }
