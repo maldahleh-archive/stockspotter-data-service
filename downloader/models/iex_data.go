@@ -19,9 +19,9 @@ type IexData struct {
 	MarketOpen            bool    `json:"isUSMarketOpen"`
 }
 
-func (data IexOuterStruct) AsStockData() *StockData {
+func (data IexOuterStruct) AsStockData() StockData {
 	if data.Quote.MarketOpen || data.Quote.ExtendedChange == 0 {
-		return &StockData{
+		return StockData{
 			Symbol:        data.Quote.Symbol,
 			Price:         data.Quote.Price,
 			Change:        data.Quote.Change,
@@ -31,7 +31,7 @@ func (data IexOuterStruct) AsStockData() *StockData {
 		}
 	}
 
-	return &StockData{
+	return StockData{
 		Symbol:        data.Quote.Symbol,
 		Price:         data.Quote.ExtendedPrice,
 		Change:        data.Quote.ExtendedChange,
